@@ -10,7 +10,7 @@ const restarInventario = async (req, res) => {
     const {producto_id, Receta_id, Cantidad, TipoVenta} = req.body; // Asegúrate de que 'otros_datos' contenga la información que necesitas enviar
 
     // Consultar la cantidad actual del inventario
-    connection.query("SELECT cantidad FROM inventario WHERE producto_id = ?", [producto_id], async (error, results) => {
+    connection.query("SELECT cantidad FROM galletasStock WHERE producto_id = ?", [producto_id], async (error, results) => {
         if (error) {
             console.error("Error al obtener el inventario:", error);
             return res.status(500).json({ error: "Error al obtener el inventario." });
