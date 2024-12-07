@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const { connection } = require("../config.db");
+const { connection } = require("../config.bd");
 
 // Cargar las variables de entorno
 dotenv.config();
@@ -7,7 +7,7 @@ dotenv.config();
 // Función para obtener todo el inventario
 const obtenerTodoElInventario = (req, res) => {
     // Realizar la consulta a la base de datos
-    connection.query("SELECT producto.*, inventario.* FROM inventario INNER JOIN producto ON producto.producto_id = inventario.producto_id;", (error, results) => {
+    connection.query("SELECT * from ModuloVentas;", (error, results) => {
         if (error) {
             console.error("Error al consultar inventario:", error);
             return res.status(500).json({ error: "Error al obtener el inventario." });
