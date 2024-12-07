@@ -1,13 +1,13 @@
 const dotenv = require("dotenv");
 const { connection } = require("../config.bd");
-const axios = require("axios"); // Importar axios
+const axios = require("axios");
 
 // Cargar las variables de entorno
 dotenv.config();
 
-// Función para restar del inventario
+// Función para restar del inventario y registrar la venta
 const restarInventario = async (req, res) => {
-    const { Receta_id, Cantidad, TipoVenta } = req.body;
+    const { Receta_id, Cantidad, TipoVenta, PrecioUnitario, TotalVenta, Descuento, ClientePago } = req.body;
 
     // Consultar la cantidad actual del inventario
     connection.query(
@@ -55,11 +55,37 @@ const restarInventario = async (req, res) => {
                                 return res.status(500).json({ error: "Error al actualizar el inventario." });
                             }
 
-                            // Devolver una respuesta exitosa
-                            res.status(200).json({ 
-                                message: "Inventario actualizado correctamente.", 
-                                cantidadRestante: nueva_cantidad 
-                            });
+                            // Calcular el cambio para el cliente
+                            const cambio = ClientePago - TotalVenta;
+
+                            // Registrar la venta en ModuloVentas
+                            connection.query(
+                                `INSERT INTO ModuloVentas 
+                                (tipo_venta, cantidad, precio_unitario, total_venta, descuento_aplicado, cliente_pago, cambio, receta_id) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                                [TipoVenta, Cantidad, PrecioUnitario, TotalVenta, Descuento, ClientePago, cambio, Receta_id],
+                                (insertError) => {
+                                    if (insertError) {
+                                        console.error("Error al registrar la venta:", insertError);
+                                        return res.status(500).json({ error: "Error al registrar la venta." });
+                                    }
+
+                                    // Devolver una respuesta exitosa
+                                    res.status(200).json({
+                                        message: "Inventario actualizado y venta registrada correctamente.",
+                                        cantidadRestante: nueva_cantidad,
+                                        venta: {
+                                            tipoVenta: TipoVenta,
+                                            cantidad: Cantidad,
+                                            precioUnitario: PrecioUnitario,
+                                            totalVenta: TotalVenta,
+                                            descuento: Descuento,
+                                            clientePago: ClientePago,
+                                            cambio: cambio
+                                        }
+                                    });
+                                }
+                            );
                         }
                     );
                 } else {
@@ -96,3 +122,4 @@ module.exports = (req, res) => {
         res.status(405).end(`Método ${req.method} no permitido`);
     }
 };
+
