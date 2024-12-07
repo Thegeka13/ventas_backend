@@ -43,7 +43,7 @@ const restarInventario = async (req, res) => {
 
                 // Actualizar la cantidad en la base de datos
                 connection.query(
-                    "UPDATE inventario SET cantidad = ? WHERE producto_id = ?",
+                    "UPDATE galletasStock SET cantidad_disponible = ? WHERE receta_id = ?",
                     [nueva_cantidad, producto_id],
                     (updateError) => {
                         if (updateError) {
