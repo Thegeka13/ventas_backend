@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const { connection } = require("../config.db");
+const { connection } = require("../config.bd");
 const axios = require("axios"); // Importar axios
 
 // Cargar las variables de entorno
